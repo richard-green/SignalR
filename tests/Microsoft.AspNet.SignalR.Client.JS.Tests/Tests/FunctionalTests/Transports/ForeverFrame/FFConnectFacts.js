@@ -60,6 +60,7 @@ QUnit.asyncTimeoutTest("foreverFrame transport does not trigger verifyLastActive
 
     $.signalR.transports._logic.verifyLastActive = function (connection) {
         assert.fail("verifyLastActive should not be called.");
+        end();
     };
 
     connection._.onFailedTimeoutHandle = window.setTimeout(function () {
