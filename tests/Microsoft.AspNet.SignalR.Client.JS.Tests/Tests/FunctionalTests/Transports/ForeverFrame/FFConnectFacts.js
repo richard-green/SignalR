@@ -45,3 +45,39 @@ QUnit.asyncTimeoutTest("foreverFrame transport does not throw when it exceeds it
         connection.stop();
     };
 });
+
+QUnit.asyncTimeoutTest("foreverFrame transport does not trigger verifyLastActive when connection doesn't successfully start.", testUtilities.defaultTestTimeout, function (end, assert, testName) {
+    var connection = testUtilities.createHubConnection(end, assert, testName),
+        savedVerifyLastActive = $.signalR.transports._logic.verifyLastActive,
+        savedOnFailedTimeoutHandle = connection._.onFailedTimeoutHandle,
+        savedParse = connection._parseResponse;
+
+    connection._parseResponse = function (response) {
+        var result = savedParse.call(this, response);
+        $.network.disconnect();
+        return result;
+    }
+
+    $.signalR.transports._logic.verifyLastActive = function (connection) {
+        assert.fail("verifyLastActive was called but should not.");
+    };
+
+    connection._.onFailedTimeoutHandle = window.setTimeout(function () {
+        assert.ok(true, "FailedTimeoutHandle is called");
+        end();
+    }, 100);
+
+    connection.start({ transport: "foreverFrame" }).done(function () {
+        assert.fail("Connected");
+        end();
+    });
+
+    // Cleanup
+    return function () {
+        $.signalR.transports._logic.verifyLastActive = savedVerifyLastActive;
+        connection._.onFailedTimeoutHandle = savedOnFailedTimeoutHandle;
+        connection._parseResponse = savedParse;
+        $.network.connect();
+        connection.stop();
+    };
+});
