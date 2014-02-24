@@ -217,6 +217,11 @@ namespace Microsoft.AspNet.SignalR.Client.Transports
                 throw new ArgumentNullException("connection");
             }
 
+            if (connection.State == ConnectionState.Disconnected)
+            {
+                return false;
+            }
+
             // Ensure that we have not exceeded the reconnect window
             if(DateTime.UtcNow - connection.LastActiveAt >= connection.ReconnectWindow)
             {

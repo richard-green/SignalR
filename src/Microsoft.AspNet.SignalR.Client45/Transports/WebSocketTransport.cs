@@ -169,7 +169,7 @@ namespace Microsoft.AspNet.SignalR.Client.Transports
 
             if (disconnected && !_disconnectToken.IsCancellationRequested)
             {
-                _connectionInfo.Connection.Disconnect();
+                _connectionInfo.Connection.Stop();
             }
         }
 

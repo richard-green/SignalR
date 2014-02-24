@@ -151,7 +151,7 @@ namespace Microsoft.AspNet.SignalR.Client.Transports
 
                 if (disconnectedReceived)
                 {
-                    connection.Disconnect();
+                    connection.Stop();
                 }
             };
 
